@@ -1,0 +1,4 @@
+[submodule "factgenie"]
+	path = factgenie
+	url = https://github.com/ufal/factgenie.git
+	branch = dgt-25

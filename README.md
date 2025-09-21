@@ -5,7 +5,7 @@ Materials for the ESA MT project @ DGT workshop 2025.
 
 Find the best setup for applying LLMs to **annotating translation errors** on the level of error spans.
 
-## Our  data
+## Our data
 The data we will work with are documents from various domains. The source documents are (mostly) in English, translations are into various languages.
 
 Currently, we have the following data available (to be updated):

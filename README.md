@@ -53,7 +53,7 @@ To make the results more consistent, we will formalize the task as error span an
 
 ![alt text](img/span_eval_tasks.png)
 
-In ESA, we have the following (for each error):
+For each error, we will ask for the following:
 - character index of the **start and end** of the error span,
 - span **error category**,
 - (optionally) **explanation** of the error.
@@ -81,41 +81,70 @@ where:
 - `OCCURRENCE_INDEX` is a 0-based index for disambiguating multiple occurrences of the same text.
 
 > [!WARNING]  
-> We will **not** ask LLMs for the start/end character indices of the span. As the model does not have access to these indices, it would resort to guessing. Instead, we generate the textual content of the span (→LLMs are ok-ish at *copying* text) and find it in the source text during postprocessing.
+> We will **not** ask LLMs for the start/end character indices of the span. As the model does not have access to these indices, it would only guess. Instead, we generate the textual content of the span (→LLMs are ok-ish at *copying* text) and find it in the source text during postprocessing.
 
 ### What can we experiment with?
 
-| Area                    | Goal                                                                                                                         | What to experiment with                                                          | Expectations (=what have we observed so far)                                                                                                                                                                             |
-| ----------------------- | ---------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| **Models**              | Find a model which can perform ESA robustly across domains and languages.                                                    | Try different models (out of the available ones - see below)                     | Smaller open LLMs often struggle even with the format of the output itself, while larger LLMs can provide actionable outputs.                                                                                            |
-| **Error categories**    | Find a set of error categories that the LLMs can handle and are useful for later processing.                                 | Try to change the number of error categories and their descriptions.             | LLMs can handle any various number of categories, as long as they are described precisely.                                                                                                                               |
-| **Text chunk size**     | Find the length of the text segments that give the best results.                                                             | Try to change the size of text segments we evaluate.                             | LLMs tend to provide a constant number of annotations per output → that means they overannotate shorter chunks and underannotate longer chunks.                                                                          |
-| **Prompt instructions** | Investigate whether the LLM outputs are robust to how we formulate the prompt.                                               | Try to reformulate the prompt.                                                   | There are *critical* and *less critical* parts of the prompt. What needs to be described precisely are (1) the error categories and (2) the output format.                                                               |
-| **Error explanations**  | Investigate whether model explanations are accurate and whether asking for them tends to improve results.                    | Manually analyze model explanations, try to enable / disable the `reason` field. | Asking for an explanation is akin to the "chain-of-thought" prompting, which can improve the results, but not necessarily. Also the explanations themselves are accurate only in some cases.                             |
-| **Evaluation**          | Investigate how to evaluate the annotations produced by the model (either with reference human annotation or referenceless). | Try various metrics for evaluating the results.                                  | There are multiple ways to evaluate ESA, none of which are perfect. F1-score weighed by the length of the overlap tends to perform the best. Finding a good metric for evaluating error explanations is an open problem. |
+| Area                    | Goal                                                                                                                         | What to experiment with                                                          | Expectations (=what have we observed so far)                                                                                                                                                  |
+| ----------------------- | ---------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Models**              | Find a model which can perform ESA robustly across domains and languages.                                                    | Try different models (out of the available ones - see below)                     | Smaller open LLMs often struggle even with the format of the output itself, while larger LLMs can provide actionable outputs.                                                                 |
+| **Error categories**    | Find a set of error categories that the LLMs can handle and are useful for later processing.                                 | Try to change the number of error categories and their descriptions.             | LLMs can handle any various number of categories, as long as they are described precisely.                                                                                                    |
+| **Text chunk size**     | Find the length of the text segments that give the best results.                                                             | Try to change the size of text segments we evaluate.                             | LLMs tend to provide a constant number of annotations per output → they will overannotate shorter chunks and underannotate longer chunks.                                                     |
+| **Prompt instructions** | Investigate whether the LLM outputs are robust to how we formulate the prompt.                                               | Try to reformulate the prompt.                                                   | Some part of the prompt are *critical*, some are *less critical*. What needs to be described precisely are the error categories and the output format.                                        |
+| **Error explanations**  | Investigate whether model explanations are accurate and whether asking for them tends to improve results.                    | Manually analyze model explanations, try to enable / disable the `reason` field. | Asking for an explanation is similar to the chain-of-thought prompting, which can improve the results, but not necessarily. Also the explanations themselves are accurate only in some cases. |
+| **Evaluation**          | Investigate how to evaluate the annotations produced by the model (either with reference human annotation or referenceless). | Try various metrics for evaluating the results.                                  | There are multiple ways to evaluate ESA. F1-score weighed by the length of the overlap tends to perform the best. Finding a good metric for evaluating error explanations is an open problem. |
 
 ## Our framework
 Constraining LLM outputs, preparing the prompts, visualizing the outputs, and evaluating the annotations can be a lot of work.
 
-To make our lives easier, we will use [factgenie](https://github.com/ufal/factgenie): an annotation and visualizaiton tool we prepared exactly for this purpose.
+To make our lives easier, we will use [factgenie](https://github.com/ufal/factgenie): an annotation and visualization tool we created for this purpose.
 
 <div style="border:1px solid #ccc; padding:10px; display:block; margin: auto;">
+<a href="https://github.com/ufal/factgenie">
     <img src="img/fg-prev.png" alt="Preview" style="max-width:400px; height:auto; display:block; margin:auto;">
+    </a>
 </div>
 
 
 ### Factgenie instance
 
-You will use the factgenie instance we have prepared specifically for this project:
+You will use the factgenie instance we have prepared specifically for this project at https://quest.ms.mff.cuni.cz/nlg/dgt-workshop/.
 
-1) Go to https://quest.ms.mff.cuni.cz/nlg/dgt-workshop/
-2) Log in:
-    - **user**: `dgt`
-    - **password**: `dgtworkshop25`
+> [!NOTE]
+> You will be given the username and the password in person.
+
 
 The instance contains data and configuration files for you to start with.
 
-Before starting any experiments, please, make yourselves familiar with the **project usage guide**: 👉️ https://github.com/ufal/factgenie/wiki.
+Before starting any experiments, please, make yourselves familiar with the **usage guide**: 👉️ https://github.com/ufal/factgenie/wiki.
+
+### How to run the experiments
+
+#### LLM annotations
+The basic workflow for collecting LLM annotations is the following:
+- Go to **Annotate with LLMs**
+- Create a new campaign
+- Choose one of the example configuration files
+- Modify the parameters (categories, prompt, etc.)
+- Run the campaign
+- Examine the results 
+  - manually in the Browse / Analyze interface
+  - programatically (factgenie CLI or custom code)
+
+#### Human annotations
+We can also collect data manually. For that, we can use the interface **Annotate with human annotators**. Please wait for further instructions regarding this workflow (will depend on available data).
 
 
-Also, please attend to any last-minute instructions. I am ready to assist you with managing the data and experimental results.
+> [!NOTE]
+> Note that this guide is preliminary and can be superseded by instructions given in person. 
+
+### Available models (to be updated)
+- [**gemma3:27b**](https://ollama.com/library/gemma3:27b) (default for the DGT'25 workshop)
+- permanently serviced at ÚFAL:
+  - [**llama3.3:70b**](https://ollama.com/library/llama3.3:70b)
+  - [**deepseek-r1:70b**](https://ollama.com/library/deepseek-r1:70b)
+  - [**qwen2.5-coder-32B-instruc**t](https://ollama.com/library/qwen2.5-coder:32b)
+- other ad hoc models
+  - [**gpt-oss:20b**](https://ollama.com/library/gpt-oss:20b) (reasoning model)
+
+We can run any other reasonably-sized open models that we agree on.

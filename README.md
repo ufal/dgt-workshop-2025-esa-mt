@@ -26,6 +26,8 @@ Samples from the documents translated by a subcontractor and then evaluated in D
 - **General style** (minor/major)
 - **Design** (minor/major)
 
++ We now also have full translated documents, but with no annotations.
+
 #### (2) Data from WMT24 (public):
 
 **Domains**: books, news, social networks

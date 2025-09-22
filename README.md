@@ -138,13 +138,18 @@ We can also collect data manually. For that, we can use the interface **Annotate
 > [!NOTE]
 > Note that this guide is preliminary and can be superseded by instructions given in person. 
 
-### Available models (to be updated)
-- [**gemma3:27b**](https://ollama.com/library/gemma3:27b) (default for the DGT'25 workshop)
+### Available models
+- models for this project:
+  - [**gpt-oss:20b**](https://ollama.com/library/gpt-oss:20b) (reasoning model, slow)
+  - [**phi4:14b**](https://ollama.com/library/phi4:14b) (small model, fast)
+  - [**aya-expanse:32b**](https://ollama.com/library/aya-expanse:32b) (multilingual model)
 - permanently serviced at ÚFAL:
   - [**llama3.3:70b**](https://ollama.com/library/llama3.3:70b)
   - [**deepseek-r1:70b**](https://ollama.com/library/deepseek-r1:70b)
   - [**qwen2.5-coder-32B-instruc**t](https://ollama.com/library/qwen2.5-coder:32b)
-- other ad hoc models
-  - [**gpt-oss:20b**](https://ollama.com/library/gpt-oss:20b) (reasoning model)
+- [**gemma3:27b**](https://ollama.com/library/gemma3:27b) (model used at another DGT'25 project)
+
+> [!IMPORTANT]
+> See the prepared example configurations on how to use each model.
 
 We can run any other reasonably-sized open models that we agree on.

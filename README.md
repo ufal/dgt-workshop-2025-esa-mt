@@ -101,7 +101,7 @@ To make our lives easier, we will use [factgenie](https://github.com/ufal/factge
 
 <div style="border:1px solid #ccc; padding:10px; display:block; margin: auto;">
 <a href="https://github.com/ufal/factgenie">
-    <img src="img/fg-prev.png" alt="Preview" style="max-width:400px; height:auto; display:block; margin:auto;">
+    <img src="img/fg-prev.png" alt="Preview" style="max-width:300px; height:auto; display:block; margin:auto;">
     </a>
 </div>
 
